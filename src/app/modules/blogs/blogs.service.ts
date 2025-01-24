@@ -53,7 +53,29 @@ const updateBlogIntoDB = async (
   return result;
 };
 
+const deleteBlogFromDB = async (id: string, userData: JwtPayload) => {
+  //   check if the blog is exist
+  const blog = await Blog.isBlogExist(id);
+
+  if (!blog) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Blog not found');
+  }
+
+  //   find the user id
+  const user = await User.findOne({ email: userData.email }).select('_id');
+
+  // check if the user is the author of the blog
+  if (blog.author.toString() !== user?._id.toString()) {
+    throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized');
+  }
+
+  // delete the blog
+  const result = await Blog.findByIdAndDelete(id);
+
+  return result;
+};
 export const BlogServices = {
   createBlogIntoDB,
   updateBlogIntoDB,
+  deleteBlogFromDB,
 };
