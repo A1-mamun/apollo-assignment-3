@@ -5,6 +5,7 @@ import { TLoginUser } from './auth.interface';
 import httpStatus from 'http-status';
 import { createToken } from './auth.utils';
 import config from '../../config';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const registerUser = async (userData: TUser) => {
   // Save user data to the database
@@ -30,7 +31,7 @@ const loginUser = async (loginUserData: TLoginUser) => {
 
   //checking if the password is correct
   if (!(await User.isPasswordMatched(loginUserData?.password, user?.password)))
-    throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
 
   const jwtPayload = {
     email: user.email,
@@ -56,7 +57,47 @@ const loginUser = async (loginUserData: TLoginUser) => {
   };
 };
 
+const refreshToken = async (token: string) => {
+  // checking if the given token is valid
+  const decoded = jwt.verify(
+    token,
+    config.jwt_refresh_secret as string,
+  ) as JwtPayload;
+
+  const { email } = decoded;
+
+  // checking if the user is exist
+  const user = await User.isUserExist(email);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+  }
+
+  // checking if the user is blocked
+  const userStatus = user?.isBlocked;
+
+  if (userStatus) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  }
+
+  const jwtPayload = {
+    email: user.email,
+    role: user.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+
+  return {
+    accessToken,
+  };
+};
+
 export const AuthServices = {
   registerUser,
   loginUser,
+  refreshToken,
 };
