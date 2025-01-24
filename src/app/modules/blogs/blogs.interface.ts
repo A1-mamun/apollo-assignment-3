@@ -9,5 +9,5 @@ export interface TBlog {
 }
 
 export interface BlogModel extends Model<TBlog> {
-  isBlogExist: (id: string) => Promise<boolean>;
+  isBlogExist: (id: string) => Promise<TBlog>;
 }

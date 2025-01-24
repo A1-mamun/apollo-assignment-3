@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { BlogModel, TBlog } from './blogs.interface';
 import { model, Schema } from 'mongoose';
 
@@ -25,5 +26,31 @@ const blogSchema = new Schema<TBlog, BlogModel>(
     timestamps: true,
   },
 );
+
+blogSchema.post('save', function (doc, next) {
+  const modifiedDoc = doc as any;
+  modifiedDoc._doc = {
+    _id: doc._id,
+    title: doc.title,
+    content: doc.content,
+    author: doc.author,
+  };
+  next();
+});
+
+blogSchema.post('findOneAndUpdate', function (doc, next) {
+  const modifiedDoc = doc as any;
+  modifiedDoc._doc = {
+    _id: doc._id,
+    title: doc.title,
+    content: doc.content,
+    author: doc.author,
+  };
+  next();
+});
+
+blogSchema.statics.isBlogExist = async function (id: string) {
+  return await Blog.findById(id);
+};
 
 export const Blog = model<TBlog, BlogModel>('Blog', blogSchema);
