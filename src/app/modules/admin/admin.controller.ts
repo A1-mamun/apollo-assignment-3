@@ -5,13 +5,12 @@ import httpStatus from 'http-status';
 
 const blockUser = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  const result = await AdminServices.blockUser(userId);
+  await AdminServices.blockUser(userId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'User blocked successfully',
-    data: result,
   });
 });
 
@@ -23,7 +22,6 @@ const deleteBlog = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Blog deleted successfully',
-    data: null,
   });
 });
 export const AdminControllers = {
