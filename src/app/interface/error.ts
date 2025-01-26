@@ -1,4 +1,4 @@
-export type Terror = {
+export type TError = {
   path: string | number;
   message: string;
 }[];
@@ -6,5 +6,5 @@ export type Terror = {
 export type TGenericErrorResponse = {
   statusCode: number;
   message: string;
-  error: Terror;
+  error: TError;
 };

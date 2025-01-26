@@ -1,10 +1,10 @@
-import { Terror, TGenericErrorResponse } from '../interface/error';
+import { TError, TGenericErrorResponse } from '../interface/error';
 import mongoose from 'mongoose';
 
 const handleCastError = (
   err: mongoose.Error.CastError,
 ): TGenericErrorResponse => {
-  const error: Terror = [
+  const error: TError = [
     {
       path: err?.path,
       message: err?.message,

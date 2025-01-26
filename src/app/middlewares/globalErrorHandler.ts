@@ -1,28 +1,22 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { Terror } from '../interface/error';
+import { ErrorRequestHandler } from 'express';
 import { ZodError } from 'zod';
+import AppError from '../errors/AppError';
+import config from '../config';
 import handleZodError from '../errors/handleZodError';
 import handleCastError from '../errors/handleCastError';
 import handleValidationError from '../errors/handleValidationError';
 import handleDuplicateError from '../errors/handleDuplicateError';
-import AppError from '../errors/AppError';
-import config from '../config';
+import { TError } from '../interface/error';
 
-const globalErrorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   // default values
   const success = false;
   let statusCode = 500;
   let message = 'Something went wrong';
 
-  let error: Terror = [
+  let error: TError = [
     {
       path: '',
       message: 'Something went wrong',
@@ -72,7 +66,7 @@ const globalErrorHandler = (
     ];
   }
 
-  return res.status(statusCode).json({
+  res.status(statusCode).json({
     success,
     message,
     statusCode,
