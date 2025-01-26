@@ -79,7 +79,7 @@ const deleteBlogFromDB = async (id: string, userData: JwtPayload) => {
 
 const getAllBlogsFromDB = async (query: Record<string, unknown>) => {
   const blogsQuery = new QueryBuilder(
-    Blog.find().populate({
+    Blog.find().select('_id title content author').populate({
       path: 'author', // Field to populate
       select: '_id name email', // Properties to include
     }),
